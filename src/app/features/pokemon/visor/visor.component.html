@@ -1,1 +1,13 @@
-<p>visor works!</p>
+<mat-tab-group >
+  <mat-tab *ngFor="let value of spriteVersions" label="{{value.version}}">
+    <img [src]="value.sprite.front" width="200" height="200">
+    <img [src]="value.sprite.back" width="200" height="200">
+  </mat-tab>
+</mat-tab-group>
+<form  [formGroup]="formFilter">
+  <mat-button-toggle-group formControlName="gender" (change)="reviewShowedSprite()">
+    <mat-button-toggle value="male">Male</mat-button-toggle>
+    <mat-button-toggle value="female">Female</mat-button-toggle>
+  </mat-button-toggle-group>
+  <mat-checkbox formControlName="shiny" (change)="reviewShowedSprite()">Shiny</mat-checkbox>
+</form>

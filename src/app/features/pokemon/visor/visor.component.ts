@@ -1,4 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
+import { AllSprites } from 'src/app/core/models/AllSprites';
+import { Pokemon } from 'src/app/core/models/Pokemon';
+import { PokemonSprites } from 'src/app/core/models/PokemonSprites';
+import { Sprite } from 'src/app/core/models/Sprite';
+import { SpriteLinks } from 'src/app/core/models/SpriteLinks';
+import { PokemonService } from 'src/app/core/services/pokemon.service';
+import { PokemonResolver } from '../pokemon-routing.module';
 
 @Component({
   selector: 'app-visor',
@@ -7,9 +16,125 @@ import { Component, OnInit } from '@angular/core';
 })
 export class VisorComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private pokemonService: PokemonService,
+    private formBuilder: FormBuilder,
+    ) { }
+
+  spriteVersions: SpriteLinks[];
+  pokeSearch: String;
+  formFilter: FormGroup;
 
   ngOnInit(): void {
+    this.formFilter = this.formBuilder.group({
+      shiny: [false],
+      gender: '',
+    })
+
+    let afterGetPokemon = (pokemon:Pokemon) => {
+      this.spriteToSpriteLinks(pokemon.sprites)
+    }
+
+    this.pokeSearch = this.activatedRoute.snapshot.params.pokeSearch;
+    this.activatedRoute.data.subscribe( resolvers => afterGetPokemon(resolvers.pokemon))
+
+  }
+
+  spriteToSpriteLinks(sprite: PokemonSprites): void {
+    let newSpriteLinks: SpriteLinks[] = [];
+    let versions = Object.keys(sprite.versions)
+    for( let key of versions) {
+      let games = Object.keys(sprite.versions[key])
+
+      for(let game of games) {
+        let sprite_link: AllSprites = sprite.versions[key][game]
+
+        let defaultSprite: Sprite = {
+          front: sprite_link.front_default,
+          back: sprite_link.back_default
+        };
+
+        let shinySprite: Sprite = {
+          front: sprite_link.front_shiny,
+          back: sprite_link.back_shiny
+        };
+
+        let shinyFemaleSprite: Sprite = {
+          front: sprite_link.front_shiny_female,
+          back: sprite_link.back_shiny_female
+        };
+
+        let femaleSprite: Sprite = {
+          front: sprite_link.front_female,
+          back: sprite_link.back_female
+        }
+
+        let newSpriteLink: SpriteLinks = {
+          version: game,
+          sprite: defaultSprite,
+          default: defaultSprite,
+          shiny: shinySprite,
+          shiny_female: shinyFemaleSprite,
+          female: femaleSprite,
+        };
+
+        newSpriteLinks.push(newSpriteLink);
+      }
+
+
+    }
+    this.spriteVersions = newSpriteLinks;
+  }
+
+  reviewShowedSprite() {
+    let filter = this.formFilter.value
+
+    let verifySprite = (sprite: Sprite) => {
+      if (sprite.front !== undefined || sprite.back !== undefined) {
+        return true
+      }
+      else {
+        return false
+      }
+    }
+    let spriteFiltered = (version: SpriteLinks) => {
+      if (filter.shiny) {
+        if ( filter.gender === "female" && verifySprite(version.shiny_female)) {
+          return version.shiny_female
+        }
+        else if (verifySprite(version.shiny)){
+          return version.shiny
+        }
+        else {
+          return version.default
+        }
+      }
+      else {
+        if (filter.gender === "female" && verifySprite(version.female)) {
+          return version.female
+        }
+        else {
+          return version.default
+        }
+      }
+    }
+
+    if (filter.shiny && filter.gender === 'female') {
+      this.spriteVersions.map( version => version.sprite = spriteFiltered(version))
+    }
+    else if ( filter.shiny ) {
+      this.spriteVersions.map(version => version.sprite = spriteFiltered(version))
+    }
+    else if ( filter.gender === 'female' ) {
+      this.spriteVersions.map(version => version.sprite = spriteFiltered(version))
+    }
+    else {
+      this.spriteVersions.map( version => version.sprite = version.default )
+    }
+
   }
 
 }
+
+
