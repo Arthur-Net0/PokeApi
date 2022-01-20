@@ -1,1 +1,12 @@
-<p>abilities works!</p>
+<br />
+<div *ngIf="abilities.length" style="text-align: center;">
+  <h2 class="marked-title">Abilities:</h2>
+  <div style="display: flex; flex-direction: row;">
+    <mat-card *ngFor="let ability of abilities" [ngStyle]="cardStyle">
+      {{stringFormater(ability.name)}} <br/>
+      <p class="{{(ability.isHidden) ? 'marked' : ''}}" >
+        {{(ability.isHidden) ? "Hidden" : "Not Hidden" }}
+      </p>
+    </mat-card>
+  </div>
+</div>

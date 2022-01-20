@@ -12,4 +12,10 @@ export class ViewComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  abilitiesStyle = {
+    "display": "flex",
+    "flex-direction": "column",
+    "padding": "15px",
+    "align-items": "center"
+  }
 }

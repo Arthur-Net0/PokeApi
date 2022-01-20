@@ -1,4 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
+import { AllSprites } from 'src/app/core/models/AllSprites';
+import { Pokemon } from 'src/app/core/models/Pokemon';
+import { PokemonSprites } from 'src/app/core/models/PokemonSprites';
+import { Sprite } from 'src/app/core/models/Sprite';
+import { SpriteLinks } from 'src/app/core/models/SpriteLinks';
+import { PokemonService } from 'src/app/core/services/pokemon.service';
+import { PokemonResolver } from '../pokemon-routing.module';
 
 @Component({
   selector: 'app-visor',
@@ -7,9 +16,176 @@ import { Component, OnInit } from '@angular/core';
 })
 export class VisorComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private pokemonService: PokemonService,
+    private formBuilder: FormBuilder,
+    ) { }
+
+  spriteVersions: SpriteLinks[];
+  pokeSearch: String;
+  formFilter: FormGroup;
+  divImage = "imageins"
 
   ngOnInit(): void {
+    this.formFilter = this.formBuilder.group({
+      shiny: [false],
+      gender: '',
+    })
+
+    let afterGetPokemon = (pokemon:Pokemon) => {
+      this.spriteToSpriteLinks(pokemon.sprites)
+    }
+
+    this.activatedRoute.data.subscribe( resolvers => afterGetPokemon(resolvers.pokemon))
+
   }
 
+  spriteToSpriteLinks(sprite: PokemonSprites): void {
+    let newSpriteLinks: SpriteLinks[] = [];
+    let versions = Object.keys(sprite.versions)
+    for( let key of versions) {
+      let games = Object.keys(sprite.versions[key])
+
+      for(let game of games) {
+        if (game !== 'icons') {
+          let sprite_link: AllSprites = sprite.versions[key][game]
+
+          let defaultSprite: Sprite = {
+            front: sprite_link.front_default,
+            back: sprite_link.back_default
+          };
+
+          let shinySprite: Sprite = {
+            front: sprite_link.front_shiny,
+            back: sprite_link.back_shiny
+          };
+
+          let shinyFemaleSprite: Sprite = {
+            front: sprite_link.front_shiny_female,
+            back: sprite_link.back_shiny_female
+          };
+
+          let femaleSprite: Sprite = {
+            front: sprite_link.front_female,
+            back: sprite_link.back_female
+          }
+
+          let newSpriteLink: SpriteLinks = {
+            version: game,
+            sprite: defaultSprite,
+            default: defaultSprite,
+            shiny: shinySprite,
+            shiny_female: shinyFemaleSprite,
+            female: femaleSprite,
+          };
+
+          newSpriteLinks.push(newSpriteLink);
+        }
+      }
+
+
+    }
+    this.spriteVersions = newSpriteLinks;
+  }
+
+  reviewShowedSprite() {
+    let filter = this.formFilter.value
+
+    let verifySprite = (sprite: Sprite) => {
+      if (sprite.front !== undefined || sprite.back !== undefined) {
+        return true
+      }
+      else {
+        return false
+      }
+    }
+    let spriteFiltered = (version: SpriteLinks) => {
+      if (filter.shiny) {
+        if ( filter.gender === "female" && verifySprite(version.shiny_female)) {
+          return version.shiny_female
+        }
+        else if (verifySprite(version.shiny)){
+          return version.shiny
+        }
+        else {
+          return version.default
+        }
+      }
+      else {
+        if (filter.gender === "female" && verifySprite(version.female)) {
+          return version.female
+        }
+        else {
+          return version.default
+        }
+      }
+    }
+
+    if (filter.shiny && filter.gender === 'female') {
+      this.spriteVersions.map( version => version.sprite = spriteFiltered(version))
+    }
+    else if ( filter.shiny ) {
+      this.spriteVersions.map(version => version.sprite = spriteFiltered(version))
+    }
+    else if ( filter.gender === 'female' ) {
+      this.spriteVersions.map(version => version.sprite = spriteFiltered(version))
+    }
+    else {
+      this.spriteVersions.map( version => version.sprite = version.default )
+    }
+
+  }
+
+  revertImage(event) {
+    let images = document.getElementById(this.divImage).children
+
+    let verifyOtherImagesSRC = (img: HTMLElement) => {
+      for( let i in Object.keys(images)) {
+        let toVerify = images[i]
+        if (toVerify !== img && Boolean(toVerify.getAttribute('src')) && Boolean(img.getAttribute('src')))  {
+          return true
+        }
+      }
+      return false
+    }
+
+    for ( let i in Object.keys(images)) {
+      let image = images[i] as HTMLElement
+      if (image.classList.contains('d-none') && verifyOtherImagesSRC(image)) {
+        image.classList.remove('d-none')
+      }
+      else if (!image.classList.contains('d-none') && verifyOtherImagesSRC(image)) {
+        image.classList.add('d-none')
+      }
+    }
+  }
+
+  stringFormater(word:string) {
+    if (word.indexOf('-') != -1) {
+      if (word === 'ultra-sun-ultra-moon') {
+        return 'Ultra-Sun/Ultra-Moon'
+      }
+      else {
+        let words: Array<string> = word.split('-')
+        let _words: Array<string> = [];
+
+        words.forEach( word => {
+          let _word = word[0].toUpperCase() + word.slice(1)
+          _words.push(_word)
+        })
+
+        let _word: string = _words[0];
+        for(let i=1; i < _words.length; i++) {
+          _word += '/' + _words[i]
+        }
+        return _word
+      }
+    }
+    else {
+      return word[0].toUpperCase() + word.slice(1)
+    }
+  }
 }
+
+

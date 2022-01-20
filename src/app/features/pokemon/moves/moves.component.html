@@ -1,1 +1,19 @@
-<p>moves works!</p>
+<div style="display: flex; flex-direction: column; width: 80%; text-align: center;">
+  <table mat-table [dataSource]="moves" class="mat-elevation-z8">
+    <ng-container [matColumnDef]="column" *ngFor="let column of tableColumns">
+      <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
+      <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columnsToDisplay" style="text-align: center; margin: auto;"></tr>
+    <tr mat-row *matRowDef="let row; columns: columnsToDisplay" style="text-align: center; margin: auto;"></tr>
+  </table>
+
+  <mat-paginator
+    showFirstLastButtons
+    aria-label="Select page of periodic elements"
+    [pageSize]="numberPerPage"
+  >
+  </mat-paginator>
+</div>
+

@@ -1,1 +1,15 @@
-<p>all-forms works!</p>
+<div class="main-div">
+  <div *ngIf="evolutionChain" class="m-auto">
+    <mat-button-toggle-group>
+      <a [href]="firstFormLink" *ngIf="evolutionChain.firstForm" [ngStyle]="firstFormStyle">
+        <mat-button-toggle [ngStyle]="firstFormStyle">{{stringFormater(evolutionChain.firstForm.name)}}</mat-button-toggle>
+      </a>
+      <a [href]="secondFormLink" *ngIf="evolutionChain.secondForm" [ngStyle]="secondFormStyle">
+        <mat-button-toggle [ngStyle]="secondFormStyle">{{stringFormater(evolutionChain.secondForm.name)}}</mat-button-toggle>
+      </a>
+      <a [href]="thirdFormLink" *ngIf="evolutionChain.thirdForm" [ngStyle]="thirdFormStyle">
+        <mat-button-toggle [ngStyle]="thirdFormStyle">{{stringFormater(evolutionChain.thirdForm.name)}}</mat-button-toggle>
+      </a>
+    </mat-button-toggle-group>
+  </div>
+</div>

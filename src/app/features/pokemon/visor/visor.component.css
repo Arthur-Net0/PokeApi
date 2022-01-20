@@ -1,0 +1,39 @@
+.d-none {
+  display: none;
+}
+.revert-btn {
+  outline: none;
+  box-shadow: 0;
+  border: none;
+  align-items: center;
+  padding: 5px;
+  border-radius: 50%;
+  background-color: inherit;
+}
+.revert-btn:hover > * {
+  color: #0f7192;
+  cursor: pointer;
+}
+.revert-btn > * {
+  color: rgb(161, 151, 151);
+}
+.sprite-content {
+  display: flex;
+  flex-direction: row;
+  margin: 20px;
+}
+.sprite-content > div {
+  margin: auto;
+}
+.d-row {
+  display: flex;
+  flex-direction: row;
+}
+.form-filter-div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.form-filter-div > * {
+  margin: auto;
+}
