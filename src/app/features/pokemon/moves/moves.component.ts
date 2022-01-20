@@ -4,6 +4,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Move } from 'src/app/core/models/Move';
 import { PokemonService } from 'src/app/core/services/pokemon.service';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatTableDataSource} from '@angular/material/table';
 
 @Component({
   selector: 'app-moves',
@@ -16,41 +18,65 @@ export class MovesComponent implements OnInit {
     private activatedRoute: ActivatedRoute
   ) {}
 
-  @ViewChild(MatTable) table: MatTable<MovesComponent>;
+  // dataSource = new MatTableDataSource<Move>();
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+
 
   columnsToDisplay: string[];
-  moves = [];
+  moves: MatTableDataSource<Move>;
   tableColumns: string[];
+  numberPerPage: number = 15;
 
   ngOnInit(): void {
-    let t: Move = {
-      element: 'terra',
-      name: 'murro de barro',
-      category: 'normal',
-      pp: 10,
-      power: 30,
-    };
-    this.moves.push(t);
     this.activatedRoute.data.subscribe((value) => {
-      let _moves = [];
+      let moves = [];
       this.pokemonService.getMoves(value.pokemon).subscribe( rawMoves => {
         for( let rawMove of rawMoves ) {
           let move: Move = {
-            element: rawMove['type']['name'],
-            name: rawMove['name'],
-            category: rawMove['damage_class']['name'],
-            pp: rawMove['pp'],
-            power: rawMove['power'],
+            "Element": this.stringFormater(rawMove['type']['name']),
+            'Name': this.stringFormater(rawMove['name']),
+            'Category': this.stringFormater(rawMove['damage_class']['name']),
+            'PP': rawMove['pp'],
+            'Power': rawMove['power'],
           };
-          this.moves.push(move);
+          moves.push(move);
         }
+        while (moves.length % this.numberPerPage !== 0) {
+          moves.push({})
+        }
+        this.tableColumns = Object.keys(moves[0]);
+        this.columnsToDisplay = this.tableColumns.slice();
+        this.moves = new MatTableDataSource<Move>(moves)
+        this.moves.paginator = this.paginator;
       })
-
-
-      // this.table.renderRows();
     });
-
-    this.tableColumns = Object.keys(this.moves[0]);
-    this.columnsToDisplay = this.tableColumns.slice();
   }
+
+  stringFormater(word:string) {
+    if (word.indexOf('-') != -1) {
+      if (word === 'ultra-sun-ultra-moon') {
+        return 'Ultra-Sun/Ultra-Moon'
+      }
+      else {
+        let words: Array<string> = word.split('-')
+        let _words: Array<string> = [];
+
+        words.forEach( word => {
+          let _word = word[0].toUpperCase() + word.slice(1)
+          _words.push(_word)
+        })
+
+        let _word: string = _words[0];
+        for(let i=1; i < _words.length; i++) {
+          _word += ' ' + _words[i]
+        }
+        return _word
+      }
+    }
+    else {
+      return word[0].toUpperCase() + word.slice(1)
+    }
+  }
+
 }

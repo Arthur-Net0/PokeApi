@@ -18,18 +18,10 @@ export class PokemonResolver implements Resolve<Pokemon> {
     return this.pokemonService.getPokemon(route.params.pokeSearch);
   }
 }
-@Injectable({ providedIn: 'root' })
-export class MovesResolver implements Resolve<Object> {
-  constructor(private pokemonService: PokemonService) {}
-
-  resolve(route: ActivatedRouteSnapshot): Observable<Object[]> {
-    return this.pokemonService.getMoves(route.data.pokemon);
-  }
-}
 
 const routes: Routes = [
   {
-    path: 'pokemon',
+    path: '',
     children: [
       {
         path: '',

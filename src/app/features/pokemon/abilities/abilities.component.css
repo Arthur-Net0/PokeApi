@@ -1,0 +1,9 @@
+.marked {
+  color: red;
+}
+.marked-title {
+  font-size: 25px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #dc3545;
+}

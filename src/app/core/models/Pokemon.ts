@@ -1,4 +1,4 @@
-import { Ability } from "./Ability";
+import { PokeAbility } from "./PokeAbility";
 import { BaseStats } from "./BaseStats";
 import { PokeMove } from "./PokeMove";
 import { NameAndUrl } from "./Name&Url";
@@ -6,7 +6,7 @@ import { PokemonSprites } from "./PokemonSprites";
 import { PokeType } from "./PokeType";
 
 export interface Pokemon {
-  abilities: Ability[],
+  abilities: PokeAbility[],
   moves: PokeMove[],
   name: string,
   id: number,

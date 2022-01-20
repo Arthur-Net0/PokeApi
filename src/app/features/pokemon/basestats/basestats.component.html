@@ -1,1 +1,24 @@
-<p>basestats works!</p>
+
+  <div style="display: flex; flex-direction: row; margin: 20px;">
+    <div style="margin-left: auto;">
+      <table class="stat-table">
+        <tr *ngFor="let stat of unifiedBaseStats">
+          <td style="color: {{stat.color}};" class="stat-name">{{stringFormater(stat.name)}}</td>
+          <td style="color: {{stat.color}};" class="stat-value">{{stat.points}}</td>
+        </tr>
+      </table>
+    </div>
+    <div style="width: 35%; margin-right: auto;">
+      <div style="display: block; ">
+        <canvas mdbChart
+            [chartType]="chartType"
+            [datasets]="dataSets"
+            [labels]="labels"
+            [colors]="colors"
+            [options]="options"
+            [legend]="legend">
+        </canvas>
+      </div>
+    </div>
+  </div>
+

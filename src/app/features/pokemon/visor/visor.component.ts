@@ -25,6 +25,7 @@ export class VisorComponent implements OnInit {
   spriteVersions: SpriteLinks[];
   pokeSearch: String;
   formFilter: FormGroup;
+  divImage = "imageins"
 
   ngOnInit(): void {
     this.formFilter = this.formBuilder.group({
@@ -36,7 +37,6 @@ export class VisorComponent implements OnInit {
       this.spriteToSpriteLinks(pokemon.sprites)
     }
 
-    this.pokeSearch = this.activatedRoute.snapshot.params.pokeSearch;
     this.activatedRoute.data.subscribe( resolvers => afterGetPokemon(resolvers.pokemon))
 
   }
@@ -48,38 +48,40 @@ export class VisorComponent implements OnInit {
       let games = Object.keys(sprite.versions[key])
 
       for(let game of games) {
-        let sprite_link: AllSprites = sprite.versions[key][game]
+        if (game !== 'icons') {
+          let sprite_link: AllSprites = sprite.versions[key][game]
 
-        let defaultSprite: Sprite = {
-          front: sprite_link.front_default,
-          back: sprite_link.back_default
-        };
+          let defaultSprite: Sprite = {
+            front: sprite_link.front_default,
+            back: sprite_link.back_default
+          };
 
-        let shinySprite: Sprite = {
-          front: sprite_link.front_shiny,
-          back: sprite_link.back_shiny
-        };
+          let shinySprite: Sprite = {
+            front: sprite_link.front_shiny,
+            back: sprite_link.back_shiny
+          };
 
-        let shinyFemaleSprite: Sprite = {
-          front: sprite_link.front_shiny_female,
-          back: sprite_link.back_shiny_female
-        };
+          let shinyFemaleSprite: Sprite = {
+            front: sprite_link.front_shiny_female,
+            back: sprite_link.back_shiny_female
+          };
 
-        let femaleSprite: Sprite = {
-          front: sprite_link.front_female,
-          back: sprite_link.back_female
+          let femaleSprite: Sprite = {
+            front: sprite_link.front_female,
+            back: sprite_link.back_female
+          }
+
+          let newSpriteLink: SpriteLinks = {
+            version: game,
+            sprite: defaultSprite,
+            default: defaultSprite,
+            shiny: shinySprite,
+            shiny_female: shinyFemaleSprite,
+            female: femaleSprite,
+          };
+
+          newSpriteLinks.push(newSpriteLink);
         }
-
-        let newSpriteLink: SpriteLinks = {
-          version: game,
-          sprite: defaultSprite,
-          default: defaultSprite,
-          shiny: shinySprite,
-          shiny_female: shinyFemaleSprite,
-          female: femaleSprite,
-        };
-
-        newSpriteLinks.push(newSpriteLink);
       }
 
 
@@ -135,6 +137,55 @@ export class VisorComponent implements OnInit {
 
   }
 
+  revertImage(event) {
+    let images = document.getElementById(this.divImage).children
+
+    let verifyOtherImagesSRC = (img: HTMLElement) => {
+      for( let i in Object.keys(images)) {
+        let toVerify = images[i]
+        if (toVerify !== img && Boolean(toVerify.getAttribute('src')) && Boolean(img.getAttribute('src')))  {
+          return true
+        }
+      }
+      return false
+    }
+
+    for ( let i in Object.keys(images)) {
+      let image = images[i] as HTMLElement
+      if (image.classList.contains('d-none') && verifyOtherImagesSRC(image)) {
+        image.classList.remove('d-none')
+      }
+      else if (!image.classList.contains('d-none') && verifyOtherImagesSRC(image)) {
+        image.classList.add('d-none')
+      }
+    }
+  }
+
+  stringFormater(word:string) {
+    if (word.indexOf('-') != -1) {
+      if (word === 'ultra-sun-ultra-moon') {
+        return 'Ultra-Sun/Ultra-Moon'
+      }
+      else {
+        let words: Array<string> = word.split('-')
+        let _words: Array<string> = [];
+
+        words.forEach( word => {
+          let _word = word[0].toUpperCase() + word.slice(1)
+          _words.push(_word)
+        })
+
+        let _word: string = _words[0];
+        for(let i=1; i < _words.length; i++) {
+          _word += '/' + _words[i]
+        }
+        return _word
+      }
+    }
+    else {
+      return word[0].toUpperCase() + word.slice(1)
+    }
+  }
 }
 
 

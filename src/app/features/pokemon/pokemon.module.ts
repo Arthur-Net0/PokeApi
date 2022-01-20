@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { PokemonRoutingModule } from './pokemon-routing.module';
 import { VisorComponent } from './visor/visor.component';
 import { BasestatsComponent } from './basestats/basestats.component';
@@ -13,7 +12,10 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { ReactiveFormsModule } from '@angular/forms';
 import {MatTableModule} from '@angular/material/table';
-
+import { ChartsModule, WavesModule } from 'angular-bootstrap-md'
+import {MatCardModule} from '@angular/material/card';
+import {MatButtonModule} from '@angular/material/button';
+import {MatPaginatorModule} from '@angular/material/paginator';
 
 @NgModule({
   declarations: [VisorComponent, BasestatsComponent, MovesComponent, AllFormsComponent, ViewComponent, AbilitiesComponent],
@@ -25,6 +27,11 @@ import {MatTableModule} from '@angular/material/table';
     MatCheckboxModule,
     ReactiveFormsModule,
     MatTableModule,
+    ChartsModule,
+    WavesModule,
+    MatCardModule,
+    MatButtonModule,
+    MatPaginatorModule,
   ]
 
 })

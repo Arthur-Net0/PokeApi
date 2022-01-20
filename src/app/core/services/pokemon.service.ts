@@ -12,19 +12,17 @@ import { Move } from '../models/Move';
 export class PokemonService {
   constructor(private http: HttpClient) {}
 
-  environment = environment;
-
   // all() {
   //   return this.http.get(`${this.environment.pokeApi}`)
   // }
 
-  httpGet(url: string) {
+  httpGet(url: string): Observable<any> {
     return this.http.get(url);
   }
 
   getPokemon(pokeSearch): Observable<Pokemon> {
     return this.http.get<Pokemon>(
-      `${this.environment.pokeApi}/pokemon/${pokeSearch}`
+      `${environment.pokeApi}/pokemon/${pokeSearch}`
     );
   }
 
@@ -36,4 +34,5 @@ export class PokemonService {
 
     return forkJoin(observables);
   }
+
 }
