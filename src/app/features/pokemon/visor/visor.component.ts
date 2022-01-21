@@ -6,6 +6,7 @@ import { Pokemon } from 'src/app/core/models/Pokemon';
 import { PokemonSprites } from 'src/app/core/models/PokemonSprites';
 import { Sprite } from 'src/app/core/models/Sprite';
 import { SpriteLinks } from 'src/app/core/models/SpriteLinks';
+import { CoreUtilsService } from 'src/app/core/services/core-utils.service';
 import { PokemonService } from 'src/app/core/services/pokemon.service';
 import { PokemonResolver } from '../pokemon-routing.module';
 
@@ -20,6 +21,7 @@ export class VisorComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private pokemonService: PokemonService,
     private formBuilder: FormBuilder,
+    public coreUtils: CoreUtilsService
     ) { }
 
   spriteVersions: SpriteLinks[];
@@ -161,31 +163,6 @@ export class VisorComponent implements OnInit {
     }
   }
 
-  stringFormater(word:string) {
-    if (word.indexOf('-') != -1) {
-      if (word === 'ultra-sun-ultra-moon') {
-        return 'Ultra-Sun/Ultra-Moon'
-      }
-      else {
-        let words: Array<string> = word.split('-')
-        let _words: Array<string> = [];
-
-        words.forEach( word => {
-          let _word = word[0].toUpperCase() + word.slice(1)
-          _words.push(_word)
-        })
-
-        let _word: string = _words[0];
-        for(let i=1; i < _words.length; i++) {
-          _word += '/' + _words[i]
-        }
-        return _word
-      }
-    }
-    else {
-      return word[0].toUpperCase() + word.slice(1)
-    }
-  }
 }
 
 

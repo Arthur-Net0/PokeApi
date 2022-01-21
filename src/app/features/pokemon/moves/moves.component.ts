@@ -6,6 +6,8 @@ import { Move } from 'src/app/core/models/Move';
 import { PokemonService } from 'src/app/core/services/pokemon.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatTableDataSource} from '@angular/material/table';
+import { CoreUtilsService } from 'src/app/core/services/core-utils.service';
+import { RawMove } from 'src/app/core/models/RawMoves';
 
 @Component({
   selector: 'app-moves',
@@ -15,7 +17,8 @@ import {MatTableDataSource} from '@angular/material/table';
 export class MovesComponent implements OnInit {
   constructor(
     private pokemonService: PokemonService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    public coreUtils: CoreUtilsService
   ) {}
 
   // dataSource = new MatTableDataSource<Move>();
@@ -26,57 +29,40 @@ export class MovesComponent implements OnInit {
   columnsToDisplay: string[];
   moves: MatTableDataSource<Move>;
   tableColumns: string[];
-  numberPerPage: number = 15;
+  numberPerPage: number = 17;
+  headersClass = "moves-header"
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe((value) => {
-      let moves = [];
-      this.pokemonService.getMoves(value.pokemon).subscribe( rawMoves => {
+      let rawMovesToMoves = (rawMoves: RawMove[]):Move[] => {
+        let moves: Move[] = [];
         for( let rawMove of rawMoves ) {
           let move: Move = {
-            "Element": this.stringFormater(rawMove['type']['name']),
-            'Name': this.stringFormater(rawMove['name']),
-            'Category': this.stringFormater(rawMove['damage_class']['name']),
-            'PP': rawMove['pp'],
-            'Power': rawMove['power'],
+            element: this.coreUtils.stringFormater(rawMove.type.name),
+            name: this.coreUtils.stringFormater(rawMove.name, '-', ' '),
+            category: this.coreUtils.stringFormater(rawMove.damage_class.name),
+            pp: rawMove.pp,
+            power: rawMove.power,
           };
           moves.push(move);
         }
         while (moves.length % this.numberPerPage !== 0) {
           moves.push({})
         }
-        this.tableColumns = Object.keys(moves[0]);
+        return moves
+      }
+
+      let afterGetMoves = (rawMoves: RawMove[]) => {
+        let moves: Move[] = rawMovesToMoves(rawMoves);
+
+        this.tableColumns = this.coreUtils.stringsFormats(Object.keys(moves[0]));
         this.columnsToDisplay = this.tableColumns.slice();
         this.moves = new MatTableDataSource<Move>(moves)
         this.moves.paginator = this.paginator;
-      })
+      }
+
+      this.pokemonService.getMoves(value.pokemon).subscribe(afterGetMoves)
     });
-  }
-
-  stringFormater(word:string) {
-    if (word.indexOf('-') != -1) {
-      if (word === 'ultra-sun-ultra-moon') {
-        return 'Ultra-Sun/Ultra-Moon'
-      }
-      else {
-        let words: Array<string> = word.split('-')
-        let _words: Array<string> = [];
-
-        words.forEach( word => {
-          let _word = word[0].toUpperCase() + word.slice(1)
-          _words.push(_word)
-        })
-
-        let _word: string = _words[0];
-        for(let i=1; i < _words.length; i++) {
-          _word += ' ' + _words[i]
-        }
-        return _word
-      }
-    }
-    else {
-      return word[0].toUpperCase() + word.slice(1)
-    }
   }
 
 }

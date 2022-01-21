@@ -1,8 +1,3 @@
-.mat-header-cell.cdk-header-cell.cdk-column-Power.mat-column-Power.ng-star-inserted,
-.mat-header-cell.cdk-header-cell.cdk-column-PP.mat-column-PP.ng-star-inserted,
-.mat-header-cell.cdk-header-cell.cdk-column-PP.mat-column-Element.ng-star-inserted,
-.mat-header-cell.cdk-header-cell.cdk-column-Element.mat-column-Element.ng-star-inserted,
-.mat-header-cell.cdk-header-cell.cdk-column-Name.mat-column-Name.ng-star-inserted,
-.mat-header-cell.cdk-header-cell.cdk-column-Category.mat-column-Category.ng-star-inserted {
+.moves-header>* {
   text-align: center;
 }

@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ChartsBaseStats } from 'src/app/core/models/ChartsBaseStats';
 import { Pokemon } from 'src/app/core/models/Pokemon';
 import { UnifiedBaseStats } from 'src/app/core/models/UnifiedBaseStats';
+import { CoreUtilsService } from 'src/app/core/services/core-utils.service';
 
 @Component({
   selector: 'app-basestats',
@@ -29,7 +30,8 @@ export class BasestatsComponent implements OnInit {
   }
 
   constructor(
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    public coreUtils: CoreUtilsService,
   ) { }
 
   ngOnInit(): void {
@@ -43,7 +45,8 @@ export class BasestatsComponent implements OnInit {
 
       pokemon.stats.forEach( value => {
         newDatasets.push(value.base_stat);
-        newLabels.push(this.stringFormater(value.stat.name))
+        newLabels.push(this.coreUtils.stringFormater(value.stat.name, "-", " "))
+        // console.log(newLabels)
         newColors.push(this.colorBaseStats[value.stat.name])
         unified.push({
           name: value.stat.name,
@@ -60,24 +63,6 @@ export class BasestatsComponent implements OnInit {
 
 
   };
-  stringFormater(word:string) {
-    if (word.indexOf('-') != -1) {
-      let words: Array<string> = word.split('-')
-      let _words: Array<string> = [];
 
-      words.forEach( word => {
-        let _word = word[0].toUpperCase() + word.slice(1)
-        _words.push(_word)
-      })
-
-      let _word: string = _words[0];
-      for(let i=1; i < _words.length; i++) {
-        _word += ' ' + _words[i]
-      }
-      return _word
-    }
-    else {
-      return word[0].toUpperCase() + word.slice(1)
-    }
-  }
 }
+

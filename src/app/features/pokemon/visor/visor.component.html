@@ -1,5 +1,5 @@
 <mat-tab-group>
-  <mat-tab *ngFor="let value of spriteVersions" label="{{stringFormater(value.version)}}" class="sprite-tab">
+  <mat-tab *ngFor="let value of spriteVersions" label="{{coreUtils.stringFormater(value.version, '-', '/')}}" class="sprite-tab">
     <div class="sprite-content">
       <div class="d-row">
         <div [id]='divImage'>

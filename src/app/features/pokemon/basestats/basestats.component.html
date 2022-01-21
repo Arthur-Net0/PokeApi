@@ -3,7 +3,7 @@
     <div style="margin-left: auto;">
       <table class="stat-table">
         <tr *ngFor="let stat of unifiedBaseStats">
-          <td style="color: {{stat.color}};" class="stat-name">{{stringFormater(stat.name)}}</td>
+          <td style="color: {{stat.color}};" class="stat-name">{{coreUtils.stringFormater(stat.name, "-", " ")}}</td>
           <td style="color: {{stat.color}};" class="stat-value">{{stat.points}}</td>
         </tr>
       </table>

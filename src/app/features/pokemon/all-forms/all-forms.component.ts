@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EvolutionChain } from 'src/app/core/models/EvolutionChain';
 import { Pokemon } from 'src/app/core/models/Pokemon';
+import { CoreUtilsService } from 'src/app/core/services/core-utils.service';
 import { PokemonService } from 'src/app/core/services/pokemon.service';
 
 @Component({
@@ -12,7 +13,8 @@ import { PokemonService } from 'src/app/core/services/pokemon.service';
 export class AllFormsComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
-    private pokemonService: PokemonService
+    private pokemonService: PokemonService,
+    public coreUtils: CoreUtilsService
   ) {}
 
   evolutionChain: EvolutionChain;
@@ -85,7 +87,4 @@ export class AllFormsComponent implements OnInit {
     this.activatedRoute.data.subscribe(afterResolver);
   }
 
-  stringFormater(word: string) {
-    return word[0].toUpperCase() + word.slice(1);
-  }
 }

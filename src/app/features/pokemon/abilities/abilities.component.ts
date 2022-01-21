@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Ability } from 'src/app/core/models/Ability';
 import { Pokemon } from 'src/app/core/models/Pokemon';
+import { CoreUtilsService } from 'src/app/core/services/core-utils.service';
 
 @Component({
   selector: 'app-abilities',
@@ -11,7 +12,8 @@ import { Pokemon } from 'src/app/core/models/Pokemon';
 export class AbilitiesComponent implements OnInit {
 
   constructor(
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    public coreUtils: CoreUtilsService
   ) { }
 
   abilities: Ability[];
@@ -36,29 +38,5 @@ export class AbilitiesComponent implements OnInit {
     })
   }
 
-  stringFormater(word:string) {
-    if (word.indexOf('-') != -1) {
-      if (word === 'ultra-sun-ultra-moon') {
-        return 'Ultra-Sun/Ultra-Moon'
-      }
-      else {
-        let words: Array<string> = word.split('-')
-        let _words: Array<string> = [];
 
-        words.forEach( word => {
-          let _word = word[0].toUpperCase() + word.slice(1)
-          _words.push(_word)
-        })
-
-        let _word: string = _words[0];
-        for(let i=1; i < _words.length; i++) {
-          _word += ' ' + _words[i]
-        }
-        return _word
-      }
-    }
-    else {
-      return word[0].toUpperCase() + word.slice(1)
-    }
-  }
 }
