@@ -35,9 +35,7 @@ export class VisorComponent implements OnInit {
       gender: '',
     })
 
-    let afterGetPokemon = (pokemon:Pokemon) => {
-      this.spriteToSpriteLinks(pokemon.sprites)
-    }
+    let afterGetPokemon = (pokemon:Pokemon) => this.spriteToSpriteLinks(pokemon.sprites)
 
     this.activatedRoute.data.subscribe( resolvers => afterGetPokemon(resolvers.pokemon))
 
@@ -51,44 +49,58 @@ export class VisorComponent implements OnInit {
 
       for(let game of games) {
         if (game !== 'icons') {
-          let sprite_link: AllSprites = sprite.versions[key][game]
+          let rawSpritesLinks: AllSprites = sprite.versions[key][game]
 
-          let defaultSprite: Sprite = {
-            front: sprite_link.front_default,
-            back: sprite_link.back_default
-          };
+          let newSpriteLink: SpriteLinks = this.spriteLinksFromAll(rawSpritesLinks, game);
 
-          let shinySprite: Sprite = {
-            front: sprite_link.front_shiny,
-            back: sprite_link.back_shiny
-          };
-
-          let shinyFemaleSprite: Sprite = {
-            front: sprite_link.front_shiny_female,
-            back: sprite_link.back_shiny_female
-          };
-
-          let femaleSprite: Sprite = {
-            front: sprite_link.front_female,
-            back: sprite_link.back_female
+          if (newSpriteLink.default.front || newSpriteLink.default.back ) {
+            newSpriteLinks.push(newSpriteLink);
           }
 
-          let newSpriteLink: SpriteLinks = {
-            version: game,
-            sprite: defaultSprite,
-            default: defaultSprite,
-            shiny: shinySprite,
-            shiny_female: shinyFemaleSprite,
-            female: femaleSprite,
-          };
-
-          newSpriteLinks.push(newSpriteLink);
         }
       }
 
 
     }
     this.spriteVersions = newSpriteLinks;
+  }
+
+  private spriteLinksFromAll(rawSpriteLink: AllSprites, game: string): SpriteLinks {
+    let spriteVerify: boolean;
+
+    let verifySprite = (sprite: Sprite) => {
+      spriteVerify = Boolean(sprite.front || sprite.back)
+    }
+
+    let defaultSprite: Sprite = {
+      front: rawSpriteLink.front_default,
+      back: rawSpriteLink.back_default
+    };
+
+    let shinySprite: Sprite = {
+      front: rawSpriteLink.front_shiny,
+      back: rawSpriteLink.back_shiny
+    };
+
+    let shinyFemaleSprite: Sprite = {
+      front: rawSpriteLink.front_shiny_female,
+      back: rawSpriteLink.back_shiny_female
+    };
+
+    let femaleSprite: Sprite = {
+      front: rawSpriteLink.front_female,
+      back: rawSpriteLink.back_female
+    };
+
+    let newSpriteLink: SpriteLinks = {
+      version: game,
+      sprite: defaultSprite,
+      default: defaultSprite,
+      shiny: shinySprite,
+      shiny_female: shinyFemaleSprite,
+      female: femaleSprite,
+    };
+    return newSpriteLink;
   }
 
   reviewShowedSprite() {
