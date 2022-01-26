@@ -1,6 +1,7 @@
-import { Component, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit, Output, Predicate } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
+import { ObjectUtils } from 'src/app/core/utilities-lib/ObjectUtils';
 import { AllSprites } from 'src/app/core/models/AllSprites';
 import { Pokemon } from 'src/app/core/models/Pokemon';
 import { PokemonSprites } from 'src/app/core/models/PokemonSprites';
@@ -27,49 +28,42 @@ export class VisorComponent implements OnInit {
   pokeSearch: String;
   formFilter: FormGroup;
   divImage = 'imagens';
+  classHidden: string = 'd-none';
 
   ngOnInit(): void {
     this.formFilter = this.formBuilder.group({
       shiny: false,
       gender: '',
     });
-
-    let afterGetPokemon = (pokemon: Pokemon) => this.spriteToSpriteLinks(pokemon.sprites);
+    let afterGetPokemon = (pokemon: Pokemon) =>
+      this.spriteToSpriteLinks(pokemon.sprites);
     this.activatedRoute.data.subscribe((data) => afterGetPokemon(data.pokemon));
   }
 
   spriteToSpriteLinks(sprite: PokemonSprites): void {
     const newSpriteLinks: SpriteLinks[] = [];
-    const versions = Object.keys(sprite.versions);
     const notVersion: string[] = ['icons'];
     const verifySprite = (sprite: Sprite) => {
-      return sprite.front || sprite.back;
+      return Boolean(sprite.front || sprite.back);
     };
     const validVersion = (version: string) => {
       return notVersion.indexOf(version) === -1;
     };
-    for (let key of versions) {
-      const games = Object.keys(sprite.versions[key]);
 
-      for (let version of games) {
-        const rawSpritesLinks: AllSprites = sprite.versions[key][version];
-        const newSpriteLink: SpriteLinks = this.spriteLinksFromAll(
-          rawSpritesLinks,
-          version
-        );
+    Object.values(sprite.versions).forEach( generation => {
+      ObjectUtils.for(generation, (gameVersion, rawSprites: AllSprites) => {
+        const newSpriteLink: SpriteLinks = this.spriteLinksFromAll( rawSprites, gameVersion );
 
-        if (validVersion(version) && verifySprite(newSpriteLink.default)) {
-          newSpriteLinks.push(newSpriteLink);
+        if (validVersion(gameVersion) && verifySprite(newSpriteLink.default)) {
+          newSpriteLinks.push(newSpriteLink)
         }
-      }
-    }
+      })
+    })
+
     this.spriteVersions = newSpriteLinks;
   }
 
-  private spriteLinksFromAll(
-    rawSpriteLink: AllSprites,
-    game: string
-  ): SpriteLinks {
+  private spriteLinksFromAll(rawSpriteLink: AllSprites, game: string): SpriteLinks {
     let defaultSprite: Sprite = {
       front: rawSpriteLink.front_default,
       back: rawSpriteLink.back_default,
@@ -117,37 +111,37 @@ export class VisorComponent implements OnInit {
       }
       return version.default;
     };
-    const redefineSprite = () => this.spriteVersions.map( version => version.sprite = spriteFiltered(version) );
+    const redefineSprite = () =>
+      this.spriteVersions.map(
+        (version) => (version.sprite = spriteFiltered(version))
+      );
 
     redefineSprite();
   }
 
   revertImage() {
-    const images = document.getElementById(this.divImage).children;
+    const divImage = document.getElementById(this.divImage);
+    const images = Object.values(divImage.children)
 
-    let verifyOtherImagesSRC = (img: HTMLElement) => {
-      for (let i in Object.keys(images)) {
-        let toVerify = images[i];
-        const verifySRC = (): boolean => {
-          return Boolean(toVerify.getAttribute('src')) && Boolean(img.getAttribute('src'))
-        }
-        if (toVerify !== img && verifySRC()) {
-          return true;
-        }
-      }
-      return false;
+    let verifyOtherImagesSRC = (img: Element) => {
+      let verification: boolean = false;
+      const verifySRC = (element: Element) => Boolean(element.getAttribute('src'))
+      const verifySRCs = (first: Element, second: Element) => Boolean(verifySRC(first) && verifySRC(second));
+
+      images.forEach( element => verification = verifySRCs(element, img))
+
+      return verification;
     };
+    images.forEach((img: Element) => {
+      const imageIsHidden = img.classList.contains(this.classHidden);
 
-    for (let i in Object.keys(images)) {
-      const image = images[i] as HTMLElement;
-      const otherImageSRC: boolean = verifyOtherImagesSRC(image)
-      const imageIsHidden = image.classList.contains('d-none')
-
-      if ( imageIsHidden && otherImageSRC) {
-        image.classList.remove('d-none');
-      } else if ( !imageIsHidden && otherImageSRC ) {
-        image.classList.add('d-none');
+      if (verifyOtherImagesSRC(img)) {
+        if (imageIsHidden) {
+          img.classList.remove(this.classHidden);
+        } else {
+          img.classList.add(this.classHidden);
+        }
       }
-    }
+    })
   }
 }

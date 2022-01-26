@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ObjectUtils } from '../utilities-lib/ObjectUtils';
 
 @Injectable({
   providedIn: 'root',
@@ -57,4 +58,9 @@ export class CoreUtilsService {
     }
   }
 
+  object<T>( obj: T) {
+    return new ObjectUtils<T>(obj)
+  }
 }
+
+
